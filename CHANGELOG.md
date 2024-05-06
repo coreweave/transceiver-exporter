@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.5.0 - 2024-05-06
+### Changes
+* Added the option to include and exclude interfaces with regex
+  * Thanks @rwxd for this contribution! 
+
 ## 1.4.1 - 2023-08-01
 ### Changes
 * --version now returns the correct version
