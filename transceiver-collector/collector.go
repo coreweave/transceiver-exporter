@@ -387,11 +387,11 @@ func (t *TransceiverCollector) exportMetricsForInterface(iface *ethtool.Interfac
 }
 
 func exportDriverInfoMetricsForInterface(ifaceName string, driverInfo *ethtool.DriverInfo, ch chan<- prometheus.Metric) {
-	ch <- prometheus.MustNewConstMetric(driverDesc, prometheus.GaugeValue, 1, ifaceName, driverInfo.DriverName)
-	ch <- prometheus.MustNewConstMetric(driverVersionDesc, prometheus.GaugeValue, 1, ifaceName, driverInfo.DriverVersion)
-	ch <- prometheus.MustNewConstMetric(firmwareVersionDesc, prometheus.GaugeValue, 1, ifaceName, driverInfo.FirmwareVersion)
-	ch <- prometheus.MustNewConstMetric(busInfoDesc, prometheus.GaugeValue, 1, ifaceName, driverInfo.BusInfo)
-	ch <- prometheus.MustNewConstMetric(expansionRomVersionDesc, prometheus.GaugeValue, 1, ifaceName, driverInfo.ExpansionRomVersion)
+	ch <- prometheus.MustNewConstMetric(driverDesc, prometheus.GaugeValue, 1, ifaceName, sanitise(driverInfo.DriverName))
+	ch <- prometheus.MustNewConstMetric(driverVersionDesc, prometheus.GaugeValue, 1, ifaceName, sanitise(driverInfo.DriverVersion))
+	ch <- prometheus.MustNewConstMetric(firmwareVersionDesc, prometheus.GaugeValue, 1, ifaceName, sanitise(driverInfo.FirmwareVersion))
+	ch <- prometheus.MustNewConstMetric(busInfoDesc, prometheus.GaugeValue, 1, ifaceName, sanitise(driverInfo.BusInfo))
+	ch <- prometheus.MustNewConstMetric(expansionRomVersionDesc, prometheus.GaugeValue, 1, ifaceName, sanitise(driverInfo.ExpansionRomVersion))
 }
 
 func (t *TransceiverCollector) exportEEPROMMetricsForInterface(ifaceName string, rom eeprom.EEPROM, ch chan<- prometheus.Metric) {
@@ -531,4 +531,10 @@ func (t *TransceiverCollector) exportMeasurementLightLevels(labels []string, mea
 			ch <- prometheus.MustNewConstMetric(measurementDesc.ThresholdsLowWarningDescMw, prometheus.GaugeValue, thresholds.GetLowWarning(), labels...)
 		}
 	}
+}
+
+var sanitiseRe = regexp.MustCompile("[^a-zA-Z0-9_./()-]")
+
+func sanitise(s string) string {
+	return sanitiseRe.ReplaceAllString(s, "_")
 }
