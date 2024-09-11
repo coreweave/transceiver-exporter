@@ -6,7 +6,6 @@ import (
 	"regexp"
 	"strconv"
 
-	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
 	log "github.com/sirupsen/logrus"
 	"github.com/wobcom/go-ethtool"
@@ -299,13 +298,13 @@ func (t *TransceiverCollector) Describe(ch chan<- *prometheus.Desc) {
 func (t *TransceiverCollector) getMonitoredInterfaces() ([]string, error) {
 	interfaces, err := net.Interfaces()
 	if err != nil {
-		return []string{}, errors.Wrapf(err, "Could not enumerate system's interfaces")
+		return []string{}, fmt.Errorf("could not enumerate system's interfaces: %w", err)
 	}
 
 	InterfacesExcluded := len(t.excludeInterfaces) > 0
 	InterfacesIncluded := len(t.includeInterfaces) > 0
 	if InterfacesExcluded && InterfacesIncluded {
-		return []string{}, errors.New("Cannot include and exclude interfaces at the same time")
+		return []string{}, fmt.Errorf("cannot include and exclude interfaces at the same time")
 	}
 
 	// check if the regex is a non empty string to prevent matching no interfaces
@@ -352,7 +351,7 @@ func (t *TransceiverCollector) Collect(ch chan<- prometheus.Metric, errs chan er
 	}
 	tool, err := ethtool.NewEthtool()
 	if err != nil {
-		errs <- fmt.Errorf("Could not instanciate ethtool: %v", err)
+		errs <- fmt.Errorf("could not instantiate ethtool: %w", err)
 		return
 	}
 	defer tool.Close()
@@ -360,7 +359,7 @@ func (t *TransceiverCollector) Collect(ch chan<- prometheus.Metric, errs chan er
 	for _, ifaceName := range ifaceNames {
 		iface, err := tool.NewInterface(ifaceName, true)
 		if err != nil {
-			errs <- fmt.Errorf("Error fetching information for interface %s: %v", ifaceName, err)
+			errs <- fmt.Errorf("fetching information for interface %s: %w", ifaceName, err)
 			continue
 		}
 		if iface != nil {

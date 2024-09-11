@@ -8,10 +8,10 @@ import (
 	"regexp"
 	"strings"
 
+	transceivercollector "github.com/coreweave/transceiver-exporter/transceiver-collector"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
-	transceivercollector "github.com/wobcom/transceiver-exporter/transceiver-collector"
 )
 
 const version string = "1.5.0"
